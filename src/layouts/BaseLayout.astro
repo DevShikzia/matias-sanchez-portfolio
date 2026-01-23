@@ -20,6 +20,9 @@ const { title, description } = Astro.props;
 		<MainHead title={title} description={description} />
 	</head>
 	<body>
+		<div class="dev-banner">
+			<span>🚧</span> Página en desarrollo <span>🚧</span>
+		</div>
 		<div class="stack backgrounds">
 			<Nav />
 			<slot />
@@ -153,6 +156,29 @@ const { title, description } = Astro.props;
 		</script>
 
 		<style>
+			.dev-banner {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 9999;
+				background: linear-gradient(90deg, var(--accent-dark) 0%, var(--accent-regular) 50%, var(--accent-dark) 100%);
+				color: var(--gray-999);
+				text-align: center;
+				padding: 0.5rem 1rem;
+				font-size: var(--text-sm);
+				font-weight: 600;
+				letter-spacing: 0.05em;
+			}
+			
+			.dev-banner span {
+				font-size: 1em;
+			}
+			
+			.stack.backgrounds {
+				padding-top: 2.5rem;
+			}
+
 			:root {
 				--_placeholder-bg: linear-gradient(transparent, transparent);
 				/* Desactivar imágenes de fondo con violeta - usar solo gradientes oceánicos */

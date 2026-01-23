@@ -22,6 +22,9 @@ const projects = (await getCollection('work')).sort(
 				tagline="Vea mis proyectos recientes abajo para obtener una idea de mi experiencia."
 				align="start"
 			/>
+			<div class="notice">
+				<p>🔧 <strong>Sección en construcción</strong> — Los proyectos se irán agregando próximamente con sus detalles completos.</p>
+			</div>
 			<Grid variant="offset">
 				{
 					projects.map((project) => (
@@ -35,3 +38,18 @@ const projects = (await getCollection('work')).sort(
 		<ContactCTA />
 	</div>
 </BaseLayout>
+
+<style>
+	.notice {
+		background: var(--gray-999_40);
+		border: 1px solid var(--accent-regular);
+		border-radius: 0.75rem;
+		padding: 1rem 1.5rem;
+		text-align: center;
+		color: var(--gray-200);
+	}
+
+	.notice strong {
+		color: var(--accent-regular);
+	}
+</style>

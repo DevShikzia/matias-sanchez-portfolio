@@ -8,13 +8,17 @@ interface Props {
 const { data, id } = Astro.props.project;
 ---
 
-<a class="card" href={`/work/${id}`}>
-	<span class="title">{data.title}</span>
+<div class="card disabled">
+	<span class="title">{data.title} <span class="badge">En proceso...</span></span>
 	<img src={data.img} alt={data.img_alt || ''} loading="lazy" decoding="async" />
-</a>
+	<div class="overlay">
+		<span class="overlay-text">Próximamente</span>
+	</div>
+</div>
 
 <style>
 	.card {
+		position: relative;
 		display: grid;
 		grid-template: auto 1fr / auto 1fr;
 		height: 11rem;
@@ -30,18 +34,35 @@ const { data, id } = Astro.props.project;
 		transition: box-shadow var(--theme-transition);
 	}
 
+	.card.disabled {
+		cursor: not-allowed;
+	}
+
 	.card:hover {
 		box-shadow: var(--shadow-md);
 	}
 
 	.title {
 		grid-area: 1 / 1 / 2 / 2;
-		z-index: 1;
+		z-index: 2;
 		margin: 0.5rem;
 		padding: 0.5rem 1rem;
 		background: var(--gray-999);
 		color: var(--gray-200);
 		border-radius: 0.375rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.badge {
+		font-size: var(--text-sm);
+		padding: 0.2rem 0.5rem;
+		background: var(--accent-regular);
+		color: var(--gray-999);
+		border-radius: 0.25rem;
+		font-weight: 600;
 	}
 
 	img {
@@ -49,6 +70,31 @@ const { data, id } = Astro.props.project;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		filter: grayscale(30%) brightness(0.8);
+		transition: filter 0.3s ease;
+	}
+
+	.overlay {
+		position: absolute;
+		inset: 0;
+		background: hsla(0, 0%, 0%, 0.4);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		z-index: 1;
+	}
+
+	.card:hover .overlay {
+		opacity: 1;
+	}
+
+	.overlay-text {
+		color: white;
+		font-size: var(--text-xl);
+		font-weight: 700;
+		text-shadow: 0 2px 8px rgba(0,0,0,0.5);
 	}
 
 	@media (min-width: 50em) {
