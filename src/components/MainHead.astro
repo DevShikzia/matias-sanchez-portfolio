@@ -7,8 +7,8 @@ interface Props {
 }
 
 const {
-	title = 'Jeanine White: Personal Site',
-	description = 'The personal site of Jeanine White',
+	title = 'Matías Sánchez - Portfolio',
+	description = 'Portfolio personal de Matías Sánchez - Desarrollador Full Stack',
 } = Astro.props;
 ---
 
@@ -29,12 +29,15 @@ const {
 <script is:inline>
 	// This code is inlined in the head to make dark mode instant & blocking.
 	const getThemePreference = () => {
+		// Si hay una preferencia guardada, úsala
 		if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
 			return localStorage.getItem('theme');
 		}
-		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+		// Por defecto: siempre dark mode
+		return 'dark';
 	};
 	const isDark = getThemePreference() === 'dark';
+	// Asegurar que siempre inicie en dark mode si no hay preferencia guardada
 	document.documentElement.classList[isDark ? 'add' : 'remove']('theme-dark');
 
 	if (typeof localStorage !== 'undefined') {

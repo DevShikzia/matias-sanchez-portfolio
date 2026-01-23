@@ -27,40 +27,40 @@ const projects = (await getCollection('work'))
 		<div class="wrapper stack gap-8 lg:gap-20">
 			<header class="hero">
 				<Hero
-					title="Hello, my name is Jeanine White"
-					tagline="I am a Creative Developer who is currently based in Portland, Oregon."
+					title="Hola, mi nombre es Matias Sanchez"
+					tagline="Soy un desarrollador creativo que actualmente se encuentra en Buenos Aires, Argentina."
 					align="start"
 				>
 					<div class="roles">
-						<Pill><Icon icon="code" size="1.33em" /> Developer</Pill>
-						<Pill><Icon icon="microphone-stage" size="1.33em" /> Speaker</Pill>
-						<Pill><Icon icon="pencil-line" size="1.33em" /> Writer</Pill>
+						<Pill><Icon icon="code" size="1.33em" /> Desarrollador web</Pill>
 					</div>
 				</Hero>
 
 				<img
-					alt="Jeanine White smiling in a red plaid shirt and tortoise shell glasses"
+					alt="Matias Sanchez sonriendo con una remera negra y fondo blanco"
 					width="480"
 					height="620"
-					src="/assets/portrait.jpg"
+					src="/assets/matias-sanchez.png"
 				/>
 			</header>
 
-			<Skills />
+			<section data-animate>
+				<Skills />
+			</section>
 		</div>
 
 		<main class="wrapper stack gap-20 lg:gap-48">
-			<section class="section with-background with-cta">
+			<section class="section with-background with-cta" data-animate>
 				<header class="section-header stack gap-2 lg:gap-4">
-					<h3>Selected Work</h3>
-					<p>Take a look below at some of my featured work for clients from the past few years.</p>
+					<h3>Proyectos Destacados</h3>
+					<p>Vea abajo algunos de mis proyectos destacados</p>
 				</header>
 
 				<div class="gallery">
 					<Grid variant="offset">
 						{
-							projects.map((project) => (
-								<li>
+							projects.map((project, index) => (
+								<li data-animate data-animate-delay={(index % 4) + 1}>
 									<PortfolioPreview project={project} />
 								</li>
 							))
@@ -68,7 +68,7 @@ const projects = (await getCollection('work'))
 					</Grid>
 				</div>
 
-				<div class="cta">
+				<div class="cta" data-animate data-animate-delay="2">
 					<CallToAction href="/work/">
 						View All
 						<Icon icon="arrow-right" size="1.2em" />
@@ -76,30 +76,39 @@ const projects = (await getCollection('work'))
 				</div>
 			</section>
 
-			<section class="section with-background bg-variant">
+			<section class="section with-background bg-variant" data-animate>
 				<header class="section-header stack gap-2 lg:gap-4">
-					<h3>Mentions</h3>
+					<h3>Experiencia y proyectos</h3>
 					<p>
-						I have been fortunate enough to receive praise for my work in several publications. Take
-						a look below to learn more.
+						He trabajado en el desarrollo de sistemas web, paneles de gestión y
+						aplicaciones fullstack, enfocándome en backend, estructura y lógica de negocio.
 					</p>
 				</header>
-
+			
 				<div class="gallery">
 					<Grid variant="small">
 						{
-							['Medium', 'BuzzFeed', 'The Next Web', 'awwwards.', 'TechCrunch'].map((brand) => (
-								<li class="mention-card">
-									<p>{brand}</p>
+							[
+								'Sistema CRM con WhatsApp',
+								'Gestión de turnos y citas',
+								'Paneles administrativos',
+								'APIs REST con Node.js',
+								'Automatizaciones y procesos'
+							].map((item, index) => (
+								<li class="mention-card" data-animate="fade" data-animate-delay={(index % 4) + 1}>
+									<p>{item}</p>
 								</li>
 							))
 						}
 					</Grid>
 				</div>
 			</section>
+			
 		</main>
 
-		<ContactCTA />
+		<section data-animate>
+			<ContactCTA />
+		</section>
 	</div>
 </BaseLayout>
 
@@ -156,8 +165,6 @@ const projects = (await getCollection('work'))
 	}
 
 	.with-background::before {
-		--hero-bg: var(--bg-image-subtle-2);
-
 		content: '';
 		position: absolute;
 		pointer-events: none;
@@ -168,15 +175,47 @@ const projects = (await getCollection('work'))
 		transform: translateY(-75%) translateX(-50%);
 		background:
 			url('/assets/backgrounds/noise.png') top center/220px repeat,
-			var(--hero-bg) center center / var(--bg-gradient-size) no-repeat,
+			/*gradiente radial muy suave y difuminado*/
+			radial-gradient(ellipse at top center, 
+				hsla(195, 45%, 95%, 0.05) 0%,
+				hsla(195, 45%, 97%, 0.02) 40%,
+				transparent 70%),
 			var(--gray-999);
-		background-blend-mode: overlay, normal, normal, normal;
-		mix-blend-mode: var(--bg-blend-mode);
+		background-blend-mode: overlay, normal, normal;
+		mix-blend-mode: normal;
 		z-index: -1;
 	}
 
 	.with-background.bg-variant::before {
-		--hero-bg: var(--bg-image-subtle-1);
+		background:
+			url('/assets/backgrounds/noise.png') top center/220px repeat,
+			/*gradiente radial variante muy suave*/
+			radial-gradient(ellipse at center, 
+				transparent 0%,
+				hsla(195, 45%, 96%, 0.03) 50%,
+				transparent 100%),
+			var(--gray-999);
+	}
+	
+	:root.theme-dark .with-background::before {
+		background:
+			url('/assets/backgrounds/noise.png') top center/220px repeat,
+			/*gradiente radial para dark mode muy suave*/
+			radial-gradient(ellipse at top center, 
+				transparent 0%,
+				hsla(195, 45%, 10%, 0.08) 50%,
+				transparent 80%),
+			var(--gray-999);
+	}
+	
+	:root.theme-dark .with-background.bg-variant::before {
+		background:
+			url('/assets/backgrounds/noise.png') top center/220px repeat,
+			/*gradiente radial variante dark mode muy suave*/
+			radial-gradient(ellipse at center, 
+				hsla(195, 45%, 8%, 0.06) 0%,
+				transparent 60%),
+			var(--gray-999);
 	}
 
 	.section-header {

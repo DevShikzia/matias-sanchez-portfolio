@@ -81,14 +81,22 @@ import Icon from './Icon.astro';
 			};
 
 			// Toggle the theme when a user clicks the button.
-			button.addEventListener('click', () => setTheme(!this.isDark()));
+			button.addEventListener('click', () => {
+				// Obtener el estado actual antes de cambiar
+				const currentlyDark = document.documentElement.classList.contains('theme-dark');
+				// Alternar al estado opuesto
+				setTheme(!currentlyDark);
+			});
 
 			// Initialize button state to reflect current theme.
-			setTheme(this.isDark());
-		}
-
-		isDark() {
-			return document.documentElement.classList.contains('theme-dark');
+			// Si no hay clase theme-dark, asumimos dark mode por defecto
+			let isCurrentlyDark = document.documentElement.classList.contains('theme-dark');
+			// Si no hay clase y no hay preferencia guardada, usar dark mode
+			if (!isCurrentlyDark && typeof localStorage !== 'undefined' && !localStorage.getItem('theme')) {
+				isCurrentlyDark = true;
+				document.documentElement.classList.add('theme-dark');
+			}
+			setTheme(isCurrentlyDark);
 		}
 	}
 	customElements.define('theme-toggle', ThemeToggle);

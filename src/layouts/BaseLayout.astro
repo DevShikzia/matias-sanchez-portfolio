@@ -27,15 +27,137 @@ const { title, description } = Astro.props;
 		</div>
 
 		<script>
-			// Add “loaded” class once the document has completely loaded.
+			// Add "loaded" class once the document has completely loaded.
 			addEventListener('load', () => document.documentElement.classList.add('loaded'));
+		</script>
+		
+		<!-- Anime.js CDN -->
+		<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+		<script is:inline>
+			(function() {
+				// Evitar múltiples inicializaciones
+				if (window.__scrollAnimInit) return;
+				window.__scrollAnimInit = true;
+				
+				function waitForAnime(callback) {
+					if (typeof anime !== 'undefined') {
+						callback();
+					} else {
+						setTimeout(function() { waitForAnime(callback); }, 50);
+					}
+				}
+				
+				function init() {
+					var elements = document.querySelectorAll('[data-animate]');
+					if (!elements.length) return;
+					
+					var lastY = window.scrollY;
+					var goingDown = true;
+					
+					window.addEventListener('scroll', function() {
+						goingDown = window.scrollY >= lastY;
+						lastY = window.scrollY;
+					}, { passive: true });
+					
+					function animateElement(el) {
+						// Marcar como animado en el DOM (permanente)
+						el.setAttribute('data-animated', 'true');
+						el.style.opacity = '1';
+						el.style.transform = 'none';
+						
+						var delay = parseInt(el.getAttribute('data-animate-delay') || '0') * 100;
+						var type = el.getAttribute('data-animate') || 'up';
+						
+						var config = {
+							targets: el,
+							opacity: [0, 1],
+							duration: 600,
+							delay: delay,
+							easing: 'easeOutCubic',
+							complete: function() {
+								// Asegurar estado final
+								el.style.opacity = '1';
+								el.style.transform = 'none';
+							}
+						};
+						
+						if (type === 'up' || type === '') {
+							config.translateY = [30, 0];
+						} else if (type === 'slide-left') {
+							config.translateX = [-30, 0];
+						} else if (type === 'slide-right') {
+							config.translateX = [30, 0];
+						}
+						
+						anime(config);
+					}
+					
+					var observer = new IntersectionObserver(function(entries) {
+						entries.forEach(function(entry) {
+							var el = entry.target;
+							
+							// Ya animado? No hacer nada
+							if (el.getAttribute('data-animated') === 'true') return;
+							
+							// No está intersectando? No hacer nada
+							if (!entry.isIntersecting) return;
+							
+							// Solo animar si scroll hacia abajo (o carga inicial)
+							if (!goingDown && lastY > 100) return;
+							
+							observer.unobserve(el);
+							animateElement(el);
+						});
+					}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+					
+					// Preparar elementos
+					elements.forEach(function(el) {
+						// Si ya fue animado antes, mantenerlo visible
+						if (el.getAttribute('data-animated') === 'true') {
+							el.style.opacity = '1';
+							el.style.transform = 'none';
+							return;
+						}
+						
+						var rect = el.getBoundingClientRect();
+						var isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+						var isAboveViewport = rect.bottom <= 0; // Ya pasó (arriba del viewport)
+						var isBelowViewport = rect.top >= window.innerHeight; // Aún no llega (abajo)
+						
+						if (isAboveViewport) {
+							// Ya pasó: mostrar inmediatamente sin animación
+							el.setAttribute('data-animated', 'true');
+							el.style.opacity = '1';
+							el.style.transform = 'none';
+						} else if (isInViewport) {
+							// Visible al cargar: animar
+							animateElement(el);
+						} else if (isBelowViewport) {
+							// Aún no llega: ocultar y observar
+							el.style.opacity = '0';
+							el.style.transform = 'translateY(30px)';
+							observer.observe(el);
+						}
+					});
+				}
+				
+				// Iniciar
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', function() {
+						waitForAnime(init);
+					});
+				} else {
+					waitForAnime(init);
+				}
+			})();
 		</script>
 
 		<style>
 			:root {
 				--_placeholder-bg: linear-gradient(transparent, transparent);
-				--bg-image-main: url('/assets/backgrounds/bg-main-light-800w.jpg');
-				--bg-image-main-curves: url('/assets/backgrounds/bg-main-light.svg');
+				/* Desactivar imágenes de fondo con violeta - usar solo gradientes oceánicos */
+				--bg-image-main: var(--_placeholder-bg);
+				--bg-image-main-curves: var(--_placeholder-bg);
 				--bg-image-subtle-1: var(--_placeholder-bg);
 				--bg-image-subtle-2: var(--_placeholder-bg);
 				--bg-image-footer: var(--_placeholder-bg);
@@ -48,8 +170,8 @@ const { title, description } = Astro.props;
 			}
 
 			:root.theme-dark {
-				--bg-image-main: url('/assets/backgrounds/bg-main-dark-800w.jpg');
-				--bg-image-main-curves: url('/assets/backgrounds/bg-main-dark.svg');
+				--bg-image-main: var(--_placeholder-bg);
+				--bg-image-main-curves: var(--_placeholder-bg);
 				--bg-svg-blend-mode: darken;
 				--bg-blend-mode: lighten;
 			}
@@ -92,18 +214,30 @@ const { title, description } = Astro.props;
 				min-height: 100%;
 				isolation: isolate;
 				background:
-					/*noise*/
+					/*noise muy sutil*/
 					url('/assets/backgrounds/noise.png') top center/220px repeat,
-					/*footer*/ var(--bg-image-footer) bottom center/var(--bg-gradient-size) no-repeat,
-					/*header1*/ var(--bg-image-main-curves) top center/var(--bg-gradient-size) no-repeat,
-					/*header2*/ var(--bg-image-main) top center/var(--bg-gradient-size) no-repeat,
-					/*base*/ var(--gray-999);
-				background-blend-mode: /*noise*/
-					overlay,
-					/*footer*/ var(--bg-blend-mode),
-					/*header1*/ var(--bg-svg-blend-mode),
-					/*header2*/ normal,
-					/*base*/ normal;
+					/*gradiente radial muy suave y difuminado - sin bordes marcados*/
+					radial-gradient(ellipse 150% 100% at 50% 0%, 
+						hsla(195, 45%, 96%, 0.03) 0%,
+						hsla(195, 45%, 98%, 0.01) 50%,
+						transparent 100%),
+					/*base uniforme*/
+					var(--gray-999);
+				background-blend-mode: overlay, normal, normal;
+			}
+			
+			:root.theme-dark .backgrounds {
+				background:
+					/*noise muy sutil*/
+					url('/assets/backgrounds/noise.png') top center/220px repeat,
+					/*gradiente radial muy suave para dark mode*/
+					radial-gradient(ellipse 150% 100% at 50% 0%, 
+						transparent 0%,
+						hsla(195, 45%, 12%, 0.05) 40%,
+						transparent 80%),
+					/*base uniforme*/
+					var(--gray-999);
+				background-blend-mode: overlay, normal, normal;
 			}
 			@media (forced-colors: active) {
 				/* Deactivate custom backgrounds for high contrast users. */
